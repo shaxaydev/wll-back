@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 // Разрешаем только наш фронт для CORS
 app.use(
   cors({
-    origin: 'https://whitelanelogistics.com', // Убедись, что это правильный URL для продакшн
+    origin: '*', // Убедись, что это правильный URL для продакшн
   })
 );
 
@@ -69,6 +69,6 @@ ${form_message}
 
 app.listen(PORT, () => {
   console.log(
-    `Server is running on ${process.env.RAILWAY_PUBLIC_DOMAIN}${PORT}`
+    `Server is running on ${process.env.RAILWAY_PUBLIC_DOMAIN}:${PORT}`
   );
 });
