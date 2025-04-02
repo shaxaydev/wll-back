@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 // Разрешаем только наш фронт для CORS
 app.use(
   cors({
-    origin: 'https://whitelanelogistics.com/', // заменим на URL фронтенда, когда будем деплоить
+    origin: 'https://whitelanelogistics.com', // Убедись, что это правильный URL для продакшн
   })
 );
 
@@ -21,6 +21,9 @@ app.use(express.json());
 app.post('/send-feedback', async (req, res) => {
   const { form_name, form_email, form_subject, form_phone, form_message } =
     req.body;
+
+  // Логируем полученные данные для отладки
+  console.log('Received feedback:', req.body);
 
   const text = `
 📩 New message from website:
@@ -34,6 +37,9 @@ ${form_message}
 `;
 
   try {
+    // Логируем перед отправкой запроса в Telegram
+    console.log('Sending message to Telegram...');
+
     const response = await axios.post(
       `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
       {
@@ -42,15 +48,19 @@ ${form_message}
       }
     );
 
+    // Проверка, успешно ли отправлено
     if (response.data.ok) {
+      console.log('Message sent to Telegram successfully');
       res.status(200).json({ success: true });
     } else {
+      console.error('Telegram API error:', response.data);
       res
         .status(500)
         .json({ success: false, error: 'Ошибка при отправке в Telegram' });
     }
   } catch (error) {
-    console.error('Ошибка:', error);
+    // Логируем ошибку, если запрос не был успешным
+    console.error('Error sending message:', error);
     res
       .status(500)
       .json({ success: false, error: 'Ошибка при отправке сообщения' });
@@ -58,5 +68,7 @@ ${form_message}
 });
 
 app.listen(PORT, () => {
-  console.log(`Сервер запущен на http://localhost:${PORT}`);
+  console.log(
+    `Server is running on ${process.env.RAILWAY_PUBLIC_DOMAIN}${PORT}`
+  );
 });
